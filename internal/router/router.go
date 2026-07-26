@@ -15,6 +15,12 @@ func New() http.Handler {
 	taskStore := store.NewMemoryStore()
 	taskHandler := handlers.NewTaskHandler(taskStore)
 
-	r.Get("/tasks", taskHandler.GetTasks)
+	r.Route("/tasks", func(r chi.Router) {
+		r.Get("/", taskHandler.GetTasks)
+		r.Post("/", taskHandler.CreateTask)
+		r.Get("/{id}", taskHandler.GetTask)
+		r.Put("/{id}", taskHandler.UpdateTask)
+		r.Delete("/{id}", taskHandler.DeleteTask)
+	})
 	return r
 }
