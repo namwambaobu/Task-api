@@ -4,25 +4,28 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/namwamba/task-api/internal/models"
+	"github.com/namwamba/task-api/internal/store"
 )
 
-func GetTasks(w http.ResponseWriter, r *http.Request) {
+type TaskHandler struct {
+	store store.TaskStore
+}
 
-	tasks := []models.Task{
-		{
-			ID:    1,
-			Title: "Learn Go",
-			Done:  false,
-		},
-		{
-			ID:    2,
-			Title: "Learn Chi",
-			Done:  false,
-		},
+func NewTaskHandler(store store.TaskStore) *TaskHandler {
+	return &TaskHandler{
+		store: store,
 	}
+}
+
+func (h *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(tasks)
+	task := h.store.GetAll()
+
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 }

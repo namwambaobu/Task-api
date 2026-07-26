@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/namwamba/task-api/internal/handlers"
+	"github.com/namwamba/task-api/internal/store"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -11,6 +12,9 @@ import (
 func New() http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/tasks", handlers.GetTasks)
+	taskStore := store.NewMemoryStore()
+	taskHandler := handlers.NewTaskHandler(taskStore)
+
+	r.Get("/tasks", taskHandler.GetTasks)
 	return r
 }
